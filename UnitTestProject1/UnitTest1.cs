@@ -268,18 +268,21 @@ namespace UnitTestProject1
             Console.Write("----------- DefUse ---------- \n");
             var defuse = new DefUseVariables(exprsAnalizer, cfg);
 
+            var blocksList = blocks.ToList();
             foreach (var variable in defuse.DefUseList)
             {
-                Console.WriteLine("< " + variable.Key.Key + ", Defined in Block " + variable.Key.Value.GetHashCode() + "> => \n");
+                var indexVar = blocksList.IndexOf(variable.Key.Value);
+                Console.WriteLine("< " + variable.Key.Key + ", Defined in Block " + indexVar + "> => \n");
                 Console.WriteLine("Used in blocks: ");
                 foreach (var varUse in variable.Value)
                 {
                     var t = varUse.GetType();
                     var node = t.GetProperty("node").GetValue(varUse, null);
                     var line = t.GetProperty("line").GetValue(varUse, null);
-                    // new { string block, int line }
-                    Console.Write("< blockID: " + node.GetHashCode() + ", line: " + line + ">, ");
-                    //Console.Write("< " + varUse.GetHashCode() + ">, ");
+
+                    var index = blocksList.IndexOf((IBaseBlock)node);
+
+                    Console.Write("< blockID: " + index + ", line: " + line + ">, ");
                 }
                 Console.WriteLine("\n");
             }

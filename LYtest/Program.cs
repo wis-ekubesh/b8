@@ -60,15 +60,17 @@ namespace LYtest
             exprsAnalizer.analyze();
 
             var defuse = new DefUseVariables(exprsAnalizer, cfg);
-
+            var blocksList = cfg.Blocks.ToList();
             foreach (var variable in defuse.DefUseList)
             {
-                Console.WriteLine("< " + variable.Key.Key + ", Defined in Block " + variable.Key.Value.GetHashCode() + "> => \n");
+                var indexVar = blocksList.IndexOf(variable.Key.Value);
+                Console.WriteLine("< " + variable.Key.Key + ", Defined in Block " + indexVar + "> => \n");
                 Console.WriteLine("Used in blocks: ");
                 foreach (var varUse in variable.Value)
                 {
                     dynamic d = varUse;
-                    Console.Write("< blockID: " + d.node.GetHashCode() + ", line: " + d.line + ">, ");
+                    var index = blocksList.IndexOf(d.node);
+                    Console.Write("< blockID: " + index + ", line: " + d.line + ">, ");
                 }
                 Console.WriteLine("\n");
             }

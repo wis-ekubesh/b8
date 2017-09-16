@@ -145,6 +145,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#описание-задачи-2">Описание задачи</a></li>
 <li><a href="#описание-реализации-1">Описание реализации</a></li>
 </ul></li>
+<li><a href="#живые-переменные-между-ббл-множества-use_b-и-def_b-1">Живые переменные между ББЛ, множества use_B и def_B</a><ul>
+<li><a href="#описание-задачи-3">Описание задачи</a></li>
+<li><a href="#описание-алгоритма-1">Описание алгоритма</a></li>
+<li><a href="#реализация-алгоритма-5">Реализация алгоритма</a></li>
+<li><a href="#пример-использования-4">Пример использования</a></li>
+</ul></li>
 </ul>
 </div>
 <h2 id="введение">Введение</h2>
@@ -940,5 +946,45 @@ HashSet &lt;CFGNode&gt; addedCyclesHeaders = <span class="kw">new</span> HashSet
 {
     BodyRegion bodyReg;
 }</code></pre></div>
+<h2 id="живые-переменные-между-ббл-множества-use_b-и-def_b-1">Живые переменные между ББЛ, множества use_B и def_B</h2>
+<h4 id="описание-задачи-3">Описание задачи</h4>
+<p>Построение def-use и use-def цепочки для блока.</p>
+<h4 id="описание-алгоритма-1">Описание алгоритма</h4>
+<p>Для каждого ББЛ: 1. берем левый операнд, если он не содержится в def - добавляем его в use. 2. Аналогично для правого операнда. 3. Добавляем в def переменную, если идет присваивание значения.</p>
+<h4 id="реализация-алгоритма-5">Реализация алгоритма</h4>
+<div class="sourceCode"><pre class="sourceCode csharp"><code class="sourceCode cs"><span class="kw">public</span> <span class="fu">DefUseBuilder</span>(List&lt;IBaseBlock&gt; blocks)
+{
+    <span class="kw">foreach</span> (var block <span class="kw">in</span> blocks)
+    {
+        <span class="dt">var</span> defsB = <span class="kw">new</span> List&lt;Definition&gt;();
+        <span class="dt">var</span> usesB = <span class="kw">new</span> List&lt;Definition&gt;();
+
+        <span class="kw">foreach</span> (var t <span class="kw">in</span> block.<span class="fu">Enumerate</span>())
+        {
+            <span class="dt">var</span> leftOperand = t.<span class="fu">LeftOperand</span> <span class="kw">as</span> IdentificatorValue;
+            <span class="dt">var</span> rightOperand = t.<span class="fu">RightOperand</span> <span class="kw">as</span> IdentificatorValue;
+    
+            <span class="kw">if</span> (leftOperand != <span class="kw">null</span> &amp;&amp; !defsB.<span class="fu">Select</span>(e =&gt; e.<span class="fu">Item2</span>).<span class="fu">Contains</span>(leftOperand))
+            {
+                usesB.<span class="fu">Add</span>(Tuple.<span class="fu">Create</span>(t.<span class="fu">Label</span>, leftOperand));
+            }
+            <span class="kw">if</span> (rightOperand != <span class="kw">null</span> &amp;&amp; !defsB.<span class="fu">Select</span>(e =&gt; e.<span class="fu">Item2</span>).<span class="fu">Contains</span>(rightOperand))
+            {
+            usesB.<span class="fu">Add</span>(Tuple.<span class="fu">Create</span>(t.<span class="fu">Label</span>, rightOperand));
+            }
+
+            <span class="dt">var</span> def = t.<span class="fu">AsDefinition</span>();
+            <span class="kw">if</span> (def != <span class="kw">null</span>)
+            {
+                defsB.<span class="fu">Add</span>(Tuple.<span class="fu">Create</span>(t.<span class="fu">Label</span>, def));
+            }
+        }
+
+        Use[block] = usesB;
+        Def[block] = defsB;
+    }
+}</code></pre></div>
+<h4 id="пример-использования-4">Пример использования</h4>
+<div class="sourceCode"><pre class="sourceCode csharp"><code class="sourceCode cs">DefUse = <span class="kw">new</span> <span class="fu">DefUseBuilder</span>(g.<span class="fu">Blocks</span>);</code></pre></div>
 </body>
 </html>

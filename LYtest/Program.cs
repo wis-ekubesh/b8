@@ -10,9 +10,10 @@ using LYtest.BaseBlocks;
 using LYtest.CFG;
 using LYtest.Optimize.AvailableExprAnalyzer;
 using LYtest.Region;
-
+using LYtest.Optimize.DefUseVariables;
 namespace LYtest
 {
+
     class Program
     {
         static void Main(string[] args)
@@ -54,7 +55,23 @@ namespace LYtest
 
 
             var exprsAnalizer = new AvailableExprAnalyzer(cfg);
+            
+           
             exprsAnalizer.analyze();
+
+            var defuse = new DefUseVariables(exprsAnalizer, cfg);
+
+            foreach (var variable in defuse.DefUseList)
+            {
+                Console.WriteLine("< " + variable.Key.Key + ", Defined in Block " + variable.Key.Value.GetHashCode() + "> => \n");
+                Console.WriteLine("Used in blocks: ");
+                foreach (var varUse in variable.Value)
+                {
+                    dynamic d = varUse;
+                    Console.Write("< blockID: " + d.node.GetHashCode() + ", line: " + d.line + ">, ");
+                }
+                Console.WriteLine("\n");
+            }
 
             var dst = new DepthSpanningTree(cfg);
             string dst_viz = dst.ToString();

@@ -30,38 +30,49 @@ namespace LYtest.Optimize.AvailableExprAnalyzer
 
                 var countOfElems = block.Enumerate().Count();
 
+                var lineCount = 0;
+                var exprCount = 0;
                 foreach (var elem in block.Enumerate().Reverse())
                 {
+                    exprCount++;
                     if (elem.IsBinOp())
                     {
                         BlockDefs[block].Add(elem.Destination);
 
                         if (elem.Operation != Operation.NoOperation)
                         {
-                            var expr = new Expression(elem.Operation, elem.LeftOperand, elem.RightOperand);
+                            var expr = new Expression(elem, block, block.Enumerate().Count() - lineCount);
 
-                            var hasThisExpr = AllExpressions.Any(iexpr => iexpr.Equals(expr));
+                            var hasThisExpr = AllExpressions.Any(iexpr => iexpr.Dist == expr.Dist && iexpr.LeftOper == expr.LeftOper && iexpr.RightOper == expr.RightOper && iexpr.Op == expr.Op);
                             if (!hasThisExpr)
                             {
                                 AllExpressions.Add(expr);
                             }
 
+                            var a1 = BlockDefs[block].Contains(elem.LeftOperand);
+                            var a2 = BlockDefs[block].Contains(elem.RightOperand);
                             if (!BlockDefs[block].Contains(elem.LeftOperand) && !BlockDefs[block].Contains(elem.RightOperand))
                             {
                                 Gen[block].Add(expr);
                             }
                         }
-
                     }
+                    lineCount++;
                 }
 
             }
 
             foreach (Expression e in AllExpressions)
                 foreach (BaseBlock block in blocks)
+                {
+                    var t = Gen[block].Contains(e);
+                    var lt = BlockDefs[block].Contains(e.LeftOper);
+                    var rt = BlockDefs[block].Contains(e.RightOper);
+
                     if (!Gen[block].Contains(e) &&
-                        (BlockDefs[block].Contains(e.LeftOper) || BlockDefs[block].Contains(e.RightOper)))
+                        (BlockDefs[block].Contains(e.Dist)))
                         Remove[block].Add(e);
+                }
         }
     }
 }

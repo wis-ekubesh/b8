@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LYtest.BaseBlocks;
 using LYtest.LinearRepr;
 using LYtest.LinearRepr.Values;
 
@@ -10,19 +11,26 @@ namespace LYtest.Optimize.AvailableExprAnalyzer
 {
     public class Expression
     {
+        public IValue Dist { get; set; }
         public Operation Op { get; set; }
         public IValue LeftOper { get; set; }
         public IValue RightOper { get; set; }
+        public IBaseBlock Block { get; set; }
+        public int Line;
 
-        public Expression(Operation op, IValue leftOper, IValue rightOper)
+        public Expression(IThreeAddressCode elem, IBaseBlock block, int line)
         {
-            Op = op;
-            LeftOper = leftOper;
-            RightOper = rightOper;
+            Dist = elem.Destination;
+            Op = elem.Operation;
+            LeftOper = elem.LeftOperand;
+            RightOper = elem.RightOperand;
+            Block = block;
+            Line = line;
         }
 
         public Expression()
         {
+            Dist = null;
             LeftOper = null;
             RightOper = null;
             Op = Operation.NoOperation;
@@ -47,12 +55,12 @@ namespace LYtest.Optimize.AvailableExprAnalyzer
 
         public override string ToString()
         {
-            return LeftOper + " " + Op + " " + RightOper;
+            return "{"+ Dist + "} = " + LeftOper + " " + Op + " " + RightOper;
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return Dist.GetHashCode() + LeftOper.GetHashCode() + RightOper.GetHashCode();
         }
     }
 }

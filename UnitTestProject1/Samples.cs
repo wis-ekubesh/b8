@@ -80,20 +80,38 @@ namespace UnitTestProject1
                                                         "custom_label2:" +
                                                         "goto custom_label1;";
 
+        public static readonly string DefUseExprSample = "y = 2 + 3;" +
+                                                "if z > 1 {" +
+                                                    "x = y + 2;" +
+                                                    "y = x + 1;" +
+                                                    "if z > 2 {" +
+                                                        "y = x + 1;" +
+                                                        "if (y > 2) {" +
+                                                            "f = x + 2;" +
+                                                        "} else {" +
+                                                            "t = y + 1;" +
+                                                            "y = x + 3;" +
+                                                        "}" +
+                                                    "}" +
+                                                "} else {" +
+                                                    "z = x + 7;" +
+                                                " }";
+
         public static readonly string AvailableExprsSample = "a = b + c;" +
-                                                "b = a - d;" +
-                                                "c = b + c;" +
-                                                "n = 0;" +
+                                            "b = a - d;" +
+                                            "c = b + c;" +
+                                            "n = 0;" +
 
-                                                "if n {" +
-                                                "  d = a - d;" +
-                                                "  a = 5;" +
-                                                "  b = 9;" +
-                                                "  for m = (5+6)..a*b {" +
-                                                "  c = a+b*3;" +
+                                            "if n {" +
+                                            "  d = a - d;" +
+                                            "  a = 5;" +
+                                            "  b = 9;" +
+                                            "  for m = (5+6)..a*b {" +
+                                            "  c = a+b*3;" +
 
-                                                " }" +
-                                                "}";
+                                            " }" +
+                                            "}";
+
             public static readonly string regionSqeuenceSample = "while c1" +
                                                     "{" +
                                                     "d = a - d;" +

@@ -22,7 +22,7 @@ namespace LYtest.CFG
         // Raw blocks
         public readonly List<IBaseBlock> Blocks;
 
-        private DominatorTree.DominatorTree dominatorTree = null;
+        public DominatorTree.DominatorTree dominatorTree = null;
 
         private NaturalCycleGraph naturalCycleGraph = null;
 

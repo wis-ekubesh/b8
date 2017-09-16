@@ -15,6 +15,7 @@ using LYtest.Visitors;
 using ProgramTree;
 using LYtest.Optimize.AvailableExprAnalyzer;
 using LYtest.Region;
+using LYtest.Optimize.DefUseVariables;
 
 namespace UnitTestProject1
 {
@@ -238,6 +239,51 @@ namespace UnitTestProject1
             Assert.IsTrue(exprsAnalizer.OutBlocks[blocks[0]].Count == 1);
             Assert.IsTrue(exprsAnalizer.InBlocks[blocks[2]].Count == 1);
             Assert.IsTrue(exprsAnalizer.OutBlocks[blocks[2]].Count == 0);
+        }
+
+
+        [TestMethod]
+        public void DefUseVariablesTest()
+        {
+            Console.Write("----------- Available Expressions Analyzer ---------- \n");
+            var root = Parser.ParseString(Samples.SampleProgramText.DefUseExprSample);
+            var code = ProgramTreeToLinear.Build(root);
+            var blocks = LinearToBaseBlock.Build(code);
+            var cfg = ListBlocksToCFG.Build(blocks);
+
+
+            var exprsAnalizer = new AvailableExprAnalyzer(cfg);
+            exprsAnalizer.analyze();
+
+
+            Console.Write("----------- CFG ---------- \n");
+            foreach(var block in cfg.Blocks)
+            {
+                Console.Write("Block with hash: " + block.GetHashCode() + "\n");
+                Console.Write(block.ToString());
+                Console.WriteLine();
+            }
+
+
+            Console.Write("----------- DefUse ---------- \n");
+            var defuse = new DefUseVariables(exprsAnalizer, cfg);
+
+            foreach (var variable in defuse.DefUseList)
+            {
+                Console.WriteLine("< " + variable.Key.Key + ", Defined in Block " + variable.Key.Value.GetHashCode() + "> => \n");
+                Console.WriteLine("Used in blocks: ");
+                foreach (var varUse in variable.Value)
+                {
+                    var t = varUse.GetType();
+                    var node = t.GetProperty("node").GetValue(varUse, null);
+                    var line = t.GetProperty("line").GetValue(varUse, null);
+                    // new { string block, int line }
+                    Console.Write("< blockID: " + node.GetHashCode() + ", line: " + line + ">, ");
+                    //Console.Write("< " + varUse.GetHashCode() + ">, ");
+                }
+                Console.WriteLine("\n");
+            }
+
         }
 
 
